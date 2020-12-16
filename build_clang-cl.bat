@@ -22,11 +22,16 @@ SET compiler_flags=^
 	-TC^
 	-Wall^
 	-WX^
-	-wd4201^
-	-wd4100^
-	-wd4189^
-	-wd4068^
-	-wd4505
+	-ferror-limit=50^
+	-Wno-unused-parameter^
+	-Wno-unused-variable^
+	-Wno-unused-function^
+	-Wno-nonportable-system-include-path^
+	-Wno-missing-prototypes^
+	-Wno-cast-align^
+	-Wno-string-conversion^
+	-Wno-extra-semi-stmt^
+	-Wno-shift-sign-overflow
 
 SET defines=^
 	-DHOMEBREW_SLOW=1^
@@ -59,7 +64,7 @@ IF NOT EXIST build mkdir build
 
 PUSHD build
 
-cl^
+clang-cl^
 	%defines%^
 	%include_directories%^
 	%compiler_flags%^

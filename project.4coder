@@ -22,16 +22,22 @@ load_paths = {
 };
 
 command_list = {
- { .name = "build",
-   .out = "*compilation*", .footer_panel = false, .save_dirty_files = true,
+ { .name = "compile",
+   .out = "*COMPILATION*", .footer_panel = true, .save_dirty_files = true,
    .cmd = { { "build.bat" , .os = "win"   },
             { "./build.sh", .os = "linux" },
             { "./build.sh", .os = "mac"   }, }, },
- { .name = "run",
-   .out = "*run*", .footer_panel = false, .save_dirty_files = false,
-   .cmd = { { "build\\homebrewJourney", .os = "win"   },
-            { "build/homebrewJourney" , .os = "linux" },
-            { "build/homebrewJourney" , .os = "mac"   }, }, },
+ { .name = "compile fullscreen",
+   .out = "*COMPILATION*", .footer_panel = false, .save_dirty_files = true,
+   .cmd = { { "build.bat" , .os = "win"   },
+            { "./build.sh", .os = "linux" },
+            { "./build.sh", .os = "mac"   }, }, },
+ { .name = "debug",
+   .out = "*DEBUG*", .footer_panel = false, .save_dirty_files = true,
+   .cmd = { { "remedybg build/homebrew_journey.rdbg" , .os = "win"   },
+            { "./build.sh", .os = "linux" },
+            { "./build.sh", .os = "mac"   }, }, },
 };
-fkey_command[1] = "build";
-fkey_command[2] = "run";
+fkey_command[1] = "compile";
+fkey_command[2] = "compile fullscreen";
+fkey_command[5] = "debug";
