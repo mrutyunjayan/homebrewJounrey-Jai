@@ -1,2 +1,2 @@
 # homebrewJourney-Jai
-Implementation of Travis Vroman's homebrew journey to learn Vulkan
+Implementation Game Engine, based on Travis Vroman's homebrew journey to learn Vulkan
