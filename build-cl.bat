@@ -22,19 +22,17 @@ SET compiler_flags=^
 	-TC^
 	-Wall^
 	-WX^
-	-ferror-limit=50^
-	-Wno-unused-parameter^
-	-Wno-unused-variable^
-	-Wno-unused-function^
-	-Wno-nonportable-system-include-path^
-	-Wno-missing-prototypes^
-	-Wno-cast-align^
-	-Wno-string-conversion^
-	-Wno-extra-semi-stmt^
-	-Wno-shift-sign-overflow
+	-wd4201^
+	-wd4100^
+	-wd4189^
+	-wd4101^
+	-wd4068^
+	-wd4820^
+	-wd4505
 
 SET defines=^
 	-DHOMEBREW_SLOW=1^
+	-DHOMEBREW_INTERNAL=1^
 	-DHOMEBREW_RELEASE=0^
 	-D_CRT_SECURE_NO_WARNINGS^
 	-DHOMEBREW_CONSOLE
@@ -64,7 +62,7 @@ IF NOT EXIST build mkdir build
 
 PUSHD build
 
-clang-cl^
+cl^
 	%defines%^
 	%include_directories%^
 	%compiler_flags%^

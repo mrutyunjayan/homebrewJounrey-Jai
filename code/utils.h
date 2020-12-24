@@ -21,6 +21,9 @@ typedef uint64_t       u64;
 typedef int32_t        b32;
 typedef unsigned int   uint;
 
+typedef size_t          size_t;
+typedef size_t          memoryIndex;
+
 typedef float          f32;
 typedef double         f64;
 typedef uintptr_t      p64;
@@ -62,5 +65,14 @@ if(!(expression)) {\
 #define IS_POWER_OF_2(x) ((x & (x - 1)) == 0)
 
 #define CLAMP(value, min, max) (value <= min) ? min : (value >= max) ? max : value;
+
+//~-------------Swap ----------------------
+#define SWAP(a, b) do { \
+u8 swapTemp[(sizeof(a) == sizeof(b)) ? sizeof(a) : -1]; \
+memcpy(swapTemp, &a, sizeof(a)); \
+memcpy(&a, &b, sizeof(a)); \
+memcpy(&b, swapTemp, sizeof(a)); \
+} while(0)
+
 
 #endif //UTILS_H

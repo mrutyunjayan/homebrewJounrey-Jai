@@ -1,14 +1,16 @@
 #include "utils.h"
+#include "game_platform.h"
 #include "win32_main.h"
 
-#pragma warning(push, 0)
+#include "game.c"
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wall"
 #include <stdarg.h>
-#include <string.h>
 #include <stdio.h>
 #include <vulkan/vulkan.h>
-#include <windows.h>
-#pragma warning(pop)
-
+#include <Windows.h>
+#pragma clang diagnostic pop
 
 //~ CONSOLE OUTPUT
 internal void
@@ -31,14 +33,15 @@ win32_console_printError(char* message) {
 	DWORD length = (DWORD)strlen(message);
 	LPDWORD numberWritten = 0;
 	WriteConsole(GetStdHandle(STD_ERROR_HANDLE),
-				 message,
-				 length,
-				 numberWritten,
-				 NULL);
+                 message,
+                 length,
+                 numberWritten,
+                 NULL);
 }
 
 //~ LOGGING
 
+#ifdef _MSC_VER
 internal void
 win32_logging_initiliaze(void) {
 	
@@ -102,20 +105,15 @@ win32_logging_output(LogLevel level,
 		case LOG_LEVEL_COUNT: break;
 	}
 	
-	va_list args;
-	va_start(args, message);
-	
 	char outMessage[255];
 	s32 outMessageLength;
 	
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
+	va_list args;
+	va_start(args, message);
 	outMessageLength = _vsnprintf(outMessage,
 								  sizeof(outMessage) - 1,
 								  message,
 								  args);
-#pragma clang diagnostic pop
-	
 	va_end(args);
 	
 	u64 totalLength = (u64)(outMessageLength + 11);
@@ -133,18 +131,75 @@ win32_logging_output(LogLevel level,
 	
 	free(outBuffer);
 }
+#endif
+
+//~ CLOCK
+
+typedef struct Clock {
+    s64 frequency;
+    s64 startTime;
+    s64 elapsed;
+} Clock;
+
+internal void
+clock_initialize(Clock* clock) {
+    
+    LARGE_INTEGER startTime;
+    LARGE_INTEGER frequency;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&startTime);
+    clock->frequency = frequency.QuadPart;
+    clock->startTime = startTime.QuadPart;
+}
+
+internal s64
+clock_absoluteTime(Clock* clock) {
+    LARGE_INTEGER timeNow;
+    QueryPerformanceCounter(&timeNow);
+    
+    return timeNow.QuadPart;
+}
+
+internal void
+clock_update(Clock* clock) {
+    if (clock->startTime) { clock->elapsed = clock_absoluteTime(clock) - clock->startTime; }
+}
+
+internal void
+clock_start(Clock* clock) {
+    clock->startTime = clock_absoluteTime(clock);
+    clock->elapsed = 0;
+}
+
+internal void
+clock_stop(Clock* clock) {
+    clock->startTime = 0;
+}
 
 //~ MAIN
 int
-main(int argc, char** argv) {
+main(int argsCount, char** args) {
 	
-	readOnly char* str = "A test log";
+    win32_State platformState = {0};
+    
+#if HOMEBREW_INTERNAL
+    LPVOID baseAddress = (LPVOID)TB(2);
+#else
+    LPVOID baseAddress = (LPVOID)0;
+#endif
+    game_Memory gameMemory  = {
+        .persistentStorageSize = MB(64),
+        .transientStorageSize = GB(2)
+    };
+    
+    platformState.totalSize = gameMemory.persistentStorageSize + gameMemory.transientStorageSize;
+    platformState.gameMemoryBlock = VirtualAlloc(baseAddress,
+                                                 (size_t)platformState.totalSize,
+                                                 MEM_RESERVE | MEM_COMMIT, 
+                                                 PAGE_READWRITE);
 	
-	HB_FATAL("Message - Float: %f, Int: %d, Bool: %i, String: '%s'\n", 3.14, 456, true, str);
-    HB_ERROR("Message - Float: %f, Int: %d, Bool: %i, String: '%s'\n", 3.14, 456, true, str);
-    HB_WARN("Message - Float: %f, Int: %d, Bool: %i, String: '%s'\n", 3.14, 456, true, str);
-    HB_INFO("Message - Float: %f, Int: %d, Bool: %i, String: '%s'\n", 3.14, 456, true, str);
-    HB_DEBUG("Message - Float: %f, Int: %d, Bool: %i, String: '%s'\n", 3.14, 456, true, str);
-    HB_TRACE("Message - Float: %f, Int: %d, Bool: %i, String: '%s'\n", 3.14, 456, true, str);
-	return 0;
+    
+    game_update();
+    
+    return 0;
 }
