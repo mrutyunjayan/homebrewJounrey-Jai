@@ -52,7 +52,6 @@ SET linker_flags=^
 	-LIBPATH:%VULKAN_SDK%\Lib^
 	-incremental:no^
 	-opt:ref^
-	-SUBSYSTEM:CONSOLE^
 	%libs%
 
 SET project=%cd%

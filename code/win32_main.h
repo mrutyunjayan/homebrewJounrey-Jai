@@ -39,6 +39,13 @@
 #define HWND HWND
 #define LRESULT LRESULT
 #define SIZE_T SIZE_T
+#define WNDCLASSA WNDCLASSA
+#define INT INT
+#define WNDPROC WNDPROC
+#define HMENU HMENU
+#define LPDWORD LPDWORD
+#define RECT RECT
+#define LONG_PTR LONG_PTR
 
 //~ LOGGING
 
@@ -121,11 +128,42 @@ __VA_ARGS__);
 #endif
 #endif
 
-//~ PLATFORM STATE
+//~ CLOCK
+typedef struct Clock {
+    s64 frequency;
+    s64 startTime;
+    s64 elapsed;
+} Clock;
 
+//~ BACKBUFFER
+typedef struct win32_OffScreenBuffer {
+    // NOTE(Jai): Pixels are always 32 bits wide, Memory Order: BB GG RR xx
+    u32 width;
+    u32 height;
+    u32 pitch;
+    u32 bytesPerPixel;
+    BITMAPINFO info;
+    void* memory;
+} win32_OffScreenBuffer;
+
+//~ WINDOWING
+typedef struct Window {
+    b32 isVisible;
+    u32 clientWidth;
+    u32 clientHeight;
+    u64* handle;
+} Window;
+
+//~ PLATFORM STATE
 typedef struct win32_State {
     void* gameMemoryBlock;
     u64 totalSize;
+    
+    Clock clock;
+    s64 lastTime;
+    
+    Window window;
+    
 } win32_State;
 
 #endif //WIN32_MAIN_H
